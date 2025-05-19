@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acelera Seduc!</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <script type="importmap">
+    {
+      "imports": {
+        "gsap": "https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.5/gsap.min.js"
+      }
+    }
+    </script>
+
+    <header>
+        <canvas id="dynamicHeaderCanvas"></canvas>
+        <div id="navbarGame">
+            <!--<div id="gameTitle">Acelera Seduc!</div>-->
+            <div id="player"></div>
+            <div id="dataItemContainer"></div>
+            <div id="scoreDisplay">Pontos: 0</div>
+            <img id="logoAcelera" src="./assets/logo_acelera.svg" alt="Logo Acelera Seduc">
+            <!--<img id="logoEstado" src="./assets/logo_seduc.svg" alt="Logo Seduc">-->
+            <div id="instructions">Click no Foguete para pular.</div>
+        </div>
+        <div id="colorBar">
+            <div class="color-segment green"></div>
+            <div class="color-segment yellow"></div>
+            <div class="color-segment red"></div>
+            <div class="color-segment blue"></div>
+        </div>
+    </header>
+    <main>
+        <section id="quiz">
+            <div class="container">
+                <h3>Teste Seus Conhecimentos sobre Dados!</h3>
+                    <p>
+                        Para obter as respostas utilize a 
+                        <a href="https://pne.seduc.ce.gov.br/" target="_blank" rel="noopener">
+                            <button class="pne-button" type="button">PNE</button>
+                        </a>
+                    </p>   
+                <div class="google-form-container">
+                    <iframe 
+                        src="https://forms.gle/nd3LLU9QLQVGWb2X7" 
+                        width="100%" 
+                        height="800" 
+                        frameborder="0" 
+                        marginheight="0" 
+                        marginwidth="0"
+                        allowfullscreen="'true"
+                        loading="lazy">
+                        Carregando…
+                    </iframe>
+                    <p class="form-note"><strong>Nota:</strong> Data Quiz - Seduc</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="data-fields">
+            <div class="container">
+                <h2>Sobre a área de dados</h2>
+                <div class="fields-container">
+                    <div class="field-card">
+                        <img src="/assets/analise_dados.gif" alt="Ícone Análise de Dados">
+                        <h3>Análise de Dados</h3>
+                        <p>Descobre insights e tendências a partir de seus dados, transformando números brutos em conhecimento acionável.</p>
+                    </div>
+                    <div class="field-card">
+                        <img src="/assets/ciencia_dados.gif" alt="Ícone Ciência de Dados">
+                        <h3>Ciência de Dados</h3>
+                        <p>Utiliza métodos científicos, processos e algoritmos para extrair conhecimento e insights de dados estruturados ou não.</p>
+                    </div>
+                    <div class="field-card">
+                        <img src="/assets/engenharia_dados.gif" alt="Ícone Engenharia de Dados">
+                        <h3>Engenharia de Dados</h3>
+                        <p>Constrói e mantem sistemas robustos para coletar, armazenar, processar e disponibilizar dados em larga escala.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <canvas id="dynamicFooterCanvas"></canvas>
+        <div class="container">
+            <p>&copy; 2025 Laboratrorio de Dados da Seduc. Todos os direitos reservados.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

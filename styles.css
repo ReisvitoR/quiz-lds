@@ -1,0 +1,448 @@
+body {
+    font-family: 'Roboto', sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    background: #f9f9f9;
+    background-size: 800% 800%;
+    animation: pastelBackgroundAnimation 20s ease infinite;
+    color: #333;
+}
+
+@keyframes pastelBackgroundAnimation {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+.container {
+    width: 80%;
+    margin: auto;
+    overflow: hidden;
+    padding: 0 20px;
+}
+
+header {
+    background: #0A2647; 
+    color: #fff;
+    min-height: 200px; 
+    border-bottom: #144272 3px solid; 
+    position: relative; 
+    overflow: hidden; 
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+#dynamicHeaderCanvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+}
+
+#navbarGame {
+    position: relative;
+    overflow: hidden; 
+    z-index: 1; 
+    width: 100%;
+    height: 100%; 
+    max-width: 800px; 
+    margin: 0 auto;
+    display: flex;
+    align-items: flex-end; 
+    justify-content: flex-start; 
+    padding: 10px;
+    box-sizing: border-box;
+    min-height: 180px; 
+}
+
+#gameTitle {
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 32px; 
+    font-weight: 700;
+    background: linear-gradient(45deg, #ffffff, #c1eaff);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5), 0 0 10px rgba(255,255,255,0.3);
+    letter-spacing: 1px;
+    z-index: 2; 
+}
+
+#player {
+    width: 75px;
+    height: 75px;
+    background-image: url('./assets/player_char.svg');
+    background-size: contain;
+    background-repeat: no-repeat;
+    position: absolute;
+    bottom: 10px; 
+    left: 50px;
+    transition: transform 0.1s ease-out; 
+}
+#logoAcelera {
+    position: absolute;
+    right: 18px;
+    bottom: 18px;
+    width: 100px;      
+    height: auto;
+    z-index: 3;
+    filter: drop-shadow(0 2px 6px rgba(0,0,0,0.18));
+    transition: transform 0.2s;
+}
+
+#logoAcelera:hover {
+    transform: scale(1.07) rotate(-2deg);
+}
+@media (max-width: 600px) {
+    #logoAcelera {
+        width: 38px;
+        right: 8px;
+        bottom: 8px;
+    }
+}
+
+#dataItemContainer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none; 
+}
+
+.data-item {
+    width: 30px;
+    height: 30px;
+    background-image: url('/assets/data_icon.svg'); 
+    background-size: contain;
+    background-repeat: no-repeat;
+    position: absolute;
+}
+    
+
+#scoreDisplay {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 20px;
+    color: #fff;
+    font-weight: bold;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.7);
+}
+
+#instructions {
+    position: absolute;
+    top: 60px; 
+    left: 20px; 
+    transform: none;
+    font-size: 14px;
+    color: #eee;
+    background-color: rgba(0,0,0,0.5);
+    padding: 5px 10px;
+    border-radius: 5px;
+    z-index: 1; 
+}
+
+#colorBar {
+    width: 100%;
+    max-width: 800px; 
+    height: 10px;
+    display: flex;
+    margin: 5px auto 10px auto; 
+    position: relative;
+    z-index: 1;
+    border-radius: 5px;
+    overflow: hidden; 
+}
+
+#colorBar .color-segment {
+    flex: 1; 
+    height: 100%;
+}
+
+#colorBar .green { background-color: #2196F3; }
+#colorBar .yellow { background-color: #FFEB3B; }
+#colorBar .red { background-color: #F44336; }
+#colorBar .blue { background-color: #4CAF50; }
+
+main section {
+    padding: 40px 0;
+    border-bottom: 1px solid #ddd;
+}
+
+main section:last-child {
+    border-bottom: none;
+}
+
+
+.pne-button {
+    display: inline-block;
+    padding: 10px 36px; 
+    font-size: 1.1rem; 
+    font-weight: 600;
+    color: #fff;
+    background: linear-gradient(90deg, #0A2647 0%, #2196F3 100%);
+    border: none;
+    border-radius: 25px;
+    box-shadow: 0 4px 16px rgba(33,150,243,0.10), 0 1.5px 4px rgba(10,38,71,0.10);
+    cursor: pointer;
+    transition: background 0.3s, transform 0.15s, box-shadow 0.3s;
+    outline: none;
+    letter-spacing: 1px;
+    margin-left: 6px;
+    vertical-align: middle;
+    position: relative;
+    overflow: hidden;
+    min-width: 120px; 
+    text-align: center; 
+}
+
+.pne-button:before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255,255,255,0.2);
+    border-radius: 100%;
+    transform: translate(-50%, -50%);
+    transition: width 0.4s ease, height 0.4s ease;
+    z-index: 0;
+}
+
+.pne-button:active:before {
+    width: 200%;
+    height: 200%;
+}
+
+.pne-button:hover, .pne-button:focus {
+    background: linear-gradient(90deg, #2196F3 0%, #0A2647 100%);
+    transform: translateY(-2px) scale(1.04);
+    box-shadow: 0 8px 24px rgba(33,150,243,0.15), 0 2px 8px rgba(10,38,71,0.13);
+}
+
+.pne-button:focus-visible {
+    outline: 2px solid #2196F3;
+    outline-offset: 2px;
+}
+
+#quiz h3 { 
+    font-size: 28px;
+    color: #0A2647; 
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+#quiz p { 
+    font-size: 16px;
+    color: #555;
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+    margin-bottom: 10px; 
+}
+
+#quiz .google-form-container {
+    margin-top: 20px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    overflow: hidden; 
+}
+
+#quiz .google-form-container iframe {
+    display: block; 
+}
+
+.form-note {
+    font-size: 0.9em;
+    color: #fff;
+    margin-top: 10px;
+    text-align: center;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+}
+
+
+#data-fields {
+    background: #f9f9f9; 
+}
+
+#data-fields h2 {
+    text-align: center;
+    font-size: 28px;
+    color: #0A2647;
+    margin-bottom: 30px;
+}
+
+.fields-container {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    gap: 20px; 
+}
+
+.field-card {
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 25px;
+    width: calc(33.333% - 40px); 
+    box-sizing: border-box; 
+    min-width: 280px; 
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.field-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.12);
+}
+
+.field-card img {
+    width: 70px; 
+    height: 70px;
+    margin-bottom: 20px;
+}
+
+.field-card h3 {
+    font-size: 22px;
+    color: #144272; 
+    margin-bottom: 10px;
+}
+
+.field-card p {
+    font-size: 15px;
+    color: #555;
+    line-height: 1.6;
+    flex-grow: 1; 
+}
+
+footer {
+    background: #0A2647; 
+    color: #fff;
+    text-align: center;
+    padding: 20px 0; 
+    margin-top: 0; 
+    position: relative;
+    overflow: hidden;
+    min-height: 100px; 
+    display: flex; 
+    align-items: center;
+    justify-content: center;
+}
+
+#dynamicFooterCanvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0; 
+}
+
+footer .container {
+    position: relative; 
+    z-index: 1;
+}
+
+footer p {
+    margin: 0;
+}
+
+@media(max-width: 992px) { 
+    .field-card {
+        width: calc(50% - 30px); 
+    }
+}
+
+@media(max-width: 768px) {
+    .container {
+        width: 90%; 
+    }
+    #gameTitle {
+        font-size: 24px; 
+    }
+    #player {
+        width: 40px;
+        height: 40px;
+        left: 30px;
+    }
+    .data-item {
+        width: 25px;
+        height: 25px;
+    }
+    #scoreDisplay {
+        font-size: 18px;
+        top: 10px;
+        right: 10px;
+    }
+    #instructions {
+        font-size: 12px;
+    }
+    .field-card {
+        width: calc(50% - 20px); 
+        min-width: 250px;
+    }
+    #quiz h3, #data-fields h2 {
+        font-size: 24px;
+    }
+    .field-card h3 {
+        font-size: 20px;
+    }
+    .field-card p {
+        font-size: 14px;
+    }
+}
+
+@media(max-width: 600px) {
+    .field-card {
+        width: 80%; 
+        max-width: 350px; 
+        margin-left: auto;
+        margin-right: auto;
+    }
+    #navbarGame {
+        min-height: 150px;
+    }
+}
+
+@media(max-width: 480px) {
+    header {
+        min-height: 150px;
+    }
+    #gameTitle {
+        font-size: 20px; 
+    }
+    #player {
+        width: 35px;
+        height: 35px;
+        left: 20px;
+    }
+    .data-item {
+        width: 20px;
+        height: 20px;
+    }
+    #instructions {
+       display: none; 
+    }
+    footer {
+        min-height: 80px;
+        padding: 15px 0;
+    }
+    #quiz h3, #data-fields h2 {
+        font-size: 22px;
+    }
+}
