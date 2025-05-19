@@ -79,7 +79,7 @@ header {
 #player {
     width: 75px;
     height: 75px;
-    background-image: url('./assets/player_char.svg');
+    background-image: url('assets/player_char.svg');
     background-size: contain;
     background-repeat: no-repeat;
     position: absolute;
@@ -121,7 +121,7 @@ header {
 .data-item {
     width: 30px;
     height: 30px;
-    background-image: url('/assets/data_icon.svg'); 
+    background-image: url('assets/data_icon.svg'); 
     background-size: contain;
     background-repeat: no-repeat;
     position: absolute;
