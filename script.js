@@ -408,6 +408,122 @@ document.addEventListener('DOMContentLoaded', () => {
         oscillator.stop(context.currentTime + 0.1);
     }
 
+    // Função para inicializar o sistema de fases
+    function initPhaseSystem() {
+        // Configurar cliques nos headers para expandir/colapsar
+        const phaseHeaders = document.querySelectorAll('.phase-header');
+        
+        phaseHeaders.forEach(header => {
+            header.addEventListener('click', function() {
+                const phase = this.parentElement;
+                const phaseContent = this.nextElementSibling;
+                
+                // Não permite expandir fases bloqueadas
+                if (phase.classList.contains('locked')) {
+                    showLockedNotification(this.dataset.phase);
+                    return;
+                }
+                
+                // Toggle expand/collapse
+                if (phaseContent.style.display === 'block') {
+                    phaseContent.style.display = 'none';
+                    this.classList.add('collapsed');
+                } else {
+                    phaseContent.style.display = 'block';
+                    this.classList.remove('collapsed');
+                }
+            });
+        });
+        
+        // Verificar fases que devem ser desbloqueadas
+        checkPhaseReleases();
+    }
+
+    function showLockedNotification(phaseId) {
+        // Mostrar uma notificação quando o usuário tenta acessar uma fase bloqueada
+        const releaseElement = document.querySelector(`[data-phase="${phaseId}"] .release-date`);
+        const releaseDate = releaseElement ? releaseElement.textContent.replace('Liberação: ', '') : 'em breve';
+        
+        alert(`Esta fase está bloqueada e será liberada ${releaseDate}.`);
+    }
+
+    function checkPhaseReleases() {
+        // Datas de liberação de cada fase (formato: YYYY-MM-DD)
+        const releaseSchedule = {
+            "fase1": "2025-05-25",
+            "fase2": "2025-06-01",
+            "fase3": "2025-06-08",
+            "fase4": "2025-06-15",
+            "fase5": "2025-06-22"
+        };
+        
+        const currentDate = new Date();
+        
+        // Verificar cada fase
+        for (const [phaseId, releaseDate] of Object.entries(releaseSchedule)) {
+            const releaseTime = new Date(releaseDate).getTime();
+            
+            // Se a data atual é posterior à data de liberação
+            if (currentDate.getTime() >= releaseTime) {
+                unlockPhase(phaseId);
+            }
+        }
+    }
+
+    function unlockPhase(phaseId) {
+        // Encontrar o elemento da fase
+        const phaseElement = document.querySelector(`.form-phase .phase-header[data-phase="${phaseId}"]`).parentElement;
+        const phaseContent = document.getElementById(`${phaseId}-content`);
+        
+        // Remover classe de bloqueio
+        phaseElement.classList.remove('locked');
+        phaseElement.classList.add('active');
+        
+        // Atualizar badge de status
+        const statusBadge = phaseElement.querySelector('.status-badge');
+        statusBadge.textContent = "Disponível";
+        statusBadge.classList.remove('locked');
+        statusBadge.classList.add('available');
+        
+        // Remover data de liberação
+        const releaseDate = phaseElement.querySelector('.release-date');
+        if (releaseDate) releaseDate.remove();
+        
+        // Carregar o formulário apropriado
+        const formURLs = {
+            "fase1": "https://forms.gle/formID1",
+            "fase2": "https://forms.gle/formID2",
+            "fase3": "https://forms.gle/formID3",
+            "fase4": "https://forms.gle/formID4",
+            "fase5": "https://forms.gle/formID5"
+        };
+        
+        // Remover overlay de bloqueio
+        const lockedOverlay = phaseContent.querySelector('.locked-overlay');
+        if (lockedOverlay) lockedOverlay.remove();
+        
+        // Carregar o iframe com o formulário
+        phaseContent.innerHTML = `
+            <div class="google-form-container">
+                <iframe 
+                    src="${formURLs[phaseId]}" 
+                    width="100%" 
+                    height="600" 
+                    frameborder="0" 
+                    marginheight="0" 
+                    marginwidth="0"
+                    allowfullscreen="true"
+                    loading="lazy">
+                    Carregando…
+                </iframe>
+                <p class="form-note"><strong>Nota:</strong> Data Quiz - ${phaseId.charAt(0).toUpperCase() + phaseId.slice(1)}</p>
+            </div>
+        `;
+    }
+
+    // Inicialização do sistema de fases
+    initPhaseSystem();
+
     const styleSheet = document.createElement("style");
     styleSheet.type = "text/css";
     styleSheet.innerText = `
