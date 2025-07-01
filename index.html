@@ -6,6 +6,18 @@
     <title>Acelera Seduc!</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        .game-call-to-action {
+            text-align: center;
+            padding: 12px;
+            font-size: 1.1em;
+            background-color: #e3f2fd;
+            color: #0d47a1;
+            font-weight: 500;
+            border-top: 1px solid #bbdefb;
+            border-bottom: 1px solid #bbdefb;
+        }
+    </style>
 </head>
 <body>
     <script type="importmap">
@@ -19,18 +31,13 @@
     <header>
         <canvas id="dynamicHeaderCanvas"></canvas>
         <div id="navbarGame">
-            <!--<div id="gameTitle">Acelera Seduc!</div>-->
             <div id="player"></div>
             <div id="dataItemContainer"></div>
-                        <div id="scoreDisplay">Pontos: 0</div>
+            <div id="scoreDisplay">Pontos: 0</div>
             <img id="logoAcelera" src="assets/logo_acelera.svg" alt="Logo Acelera Seduc">
-            <!--<img id="logoEstado" src="./assets/logo_seduc.svg" alt="Logo Seduc">-->
-            <div id="instructions">Click no Foguete para pular.</div>
+            <div id="instructions">Clique no Foguete para pular.</div>
         </div>
         <p class="game-call-to-action">🚀 <strong>Clique no foguete</strong> para decolar e acumular pontos! 🚀</p>
-        <div id="colorBar">
-            <div class="color-segment green"></div>
-            <div class="color-segment yellow"></div>
         <div id="colorBar">
             <div class="color-segment green"></div>
             <div class="color-segment yellow"></div>
@@ -38,12 +45,13 @@
             <div class="color-segment blue"></div>
         </div>
     </header>
+
     <main>
         <section id="quiz">
             <div class="container">
                 <h3>Teste Seus Conhecimentos sobre Dados!</h3>
                 <p>
-                    Para obter as respostas utilize a 
+                    Para obter as respostas utilize a ferramenta de consulta de dados:
                     <a href="https://app.powerbi.com/view?r=eyJrIjoiMjI5NTUxNjktZWYxZC00ODdmLTk0OTUtYzEwMGYyNGQyNzYyIiwidCI6ImIwNTgyNWUyLTAyZGItNDI0YS04Y2UyLTA3OWJmMDE2ZDIwMCJ9" target="_blank" rel="noopener">
                         <button class="pne-button" type="button">PNE</button>
                     </a>
@@ -51,120 +59,66 @@
                 
                 <!-- Sistema de formulários em fases -->
                 <div class="forms-container">
-                    <!-- Credenciamento - Sempre disponível -->
-                    <div class="form-phase active">
+                    <!-- As fases abaixo serão preenchidas e controladas pelo script.js -->
+
+                    <div class="form-phase locked">
                         <div class="phase-header" data-phase="credenciamento">
                             <h4>Inscrição</h4>
-                            <span class="status-badge available">Disponível</span>
-                            <span class="toggle-icon">▼</span>
+                            <span class="status-badge"></span>
+                            <span class="release-date"></span>
+                            <span class="toggle-icon"></span>
                         </div>
-                        <div class="phase-content" id="credenciamento-content" style="display: block;">
-                            <div class="google-form-container">
-                                <iframe 
-                                    src="https://forms.gle/nd3LLU9QLQVGWb2X7" 
-                                    width="100%" 
-                                    height="600" 
-                                    frameborder="0" 
-                                    marginheight="0" 
-                                    marginwidth="0"
-                                    allowfullscreen="true"
-                                    loading="lazy">
-                                    Carregando…
-                                </iframe>
-                                <p class="form-note"><strong>Nota:</strong> Data Quiz - Credenciamento</p>
-                            </div>
-                        </div>
+                        <div class="phase-content" id="credenciamento-content"></div>
                     </div>
                     
-                    <!-- Fase 1 - Bloqueada por padrão -->
                     <div class="form-phase locked">
                         <div class="phase-header" data-phase="fase1">
                             <h4>Fase 1</h4>
-                            <span class="status-badge locked">Bloqueado</span>
-                            <span class="release-date">Liberação: 25/05/2025</span>
-                            <span class="toggle-icon">▼</span>
+                            <span class="status-badge"></span>
+                            <span class="release-date"></span>
+                            <span class="toggle-icon"></span>
                         </div>
-                        <div class="phase-content" id="fase1-content">
-                            <div class="google-form-container">
-                                <div class="locked-overlay">
-                                    <i class="lock-icon">🔒</i>
-                                    <p>Este formulário será liberado em 25/05/2025</p>
-                                </div>
-                                <!-- Form será mostrado quando desbloqueado -->
-                            </div>
-                        </div>
+                        <div class="phase-content" id="fase1-content"></div>
                     </div>
                     
-                    <!-- Fase 2 -->
                     <div class="form-phase locked">
                         <div class="phase-header" data-phase="fase2">
                             <h4>Fase 2</h4>
-                            <span class="status-badge locked">Bloqueado</span>
-                            <span class="release-date">Liberação: 01/06/2025</span>
-                            <span class="toggle-icon">▼</span>
+                            <span class="status-badge"></span>
+                            <span class="release-date"></span>
+                            <span class="toggle-icon"></span>
                         </div>
-                        <div class="phase-content" id="fase2-content">
-                            <div class="google-form-container">
-                                <div class="locked-overlay">
-                                    <i class="lock-icon">🔒</i>
-                                    <p>Este formulário será liberado em 01/06/2025</p>
-                                </div>
-                            </div>
-                        </div>
+                        <div class="phase-content" id="fase2-content"></div>
                     </div>
                     
-                    <!-- Fase 3 -->
                     <div class="form-phase locked">
                         <div class="phase-header" data-phase="fase3">
                             <h4>Fase 3</h4>
-                            <span class="status-badge locked">Bloqueado</span>
-                            <span class="release-date">Liberação: 08/06/2025</span>
-                            <span class="toggle-icon">▼</span>
+                            <span class="status-badge"></span>
+                            <span class="release-date"></span>
+                            <span class="toggle-icon"></span>
                         </div>
-                        <div class="phase-content" id="fase3-content">
-                            <div class="google-form-container">
-                                <div class="locked-overlay">
-                                    <i class="lock-icon">🔒</i>
-                                    <p>Este formulário será liberado em 08/06/2025</p>
-                                </div>
-                            </div>
-                        </div>
+                        <div class="phase-content" id="fase3-content"></div>
                     </div>
                     
-                    <!-- Fase 4 -->
                     <div class="form-phase locked">
                         <div class="phase-header" data-phase="fase4">
                             <h4>Fase 4</h4>
-                            <span class="status-badge locked">Bloqueado</span>
-                            <span class="release-date">Liberação: 15/06/2025</span>
-                            <span class="toggle-icon">▼</span>
+                            <span class="status-badge"></span>
+                            <span class="release-date"></span>
+                            <span class="toggle-icon"></span>
                         </div>
-                        <div class="phase-content" id="fase4-content">
-                            <div class="google-form-container">
-                                <div class="locked-overlay">
-                                    <i class="lock-icon">🔒</i>
-                                    <p>Este formulário será liberado em 15/06/2025</p>
-                                </div>
-                            </div>
-                        </div>
+                        <div class="phase-content" id="fase4-content"></div>
                     </div>
                     
-                    <!-- Fase 5 -->
                     <div class="form-phase locked">
                         <div class="phase-header" data-phase="fase5">
                             <h4>Fase 5</h4>
-                            <span class="status-badge locked">Bloqueado</span>
-                            <span class="release-date">Liberação: 22/06/2025</span>
-                            <span class="toggle-icon">▼</span>
+                            <span class="status-badge"></span>
+                            <span class="release-date"></span>
+                            <span class="toggle-icon"></span>
                         </div>
-                        <div class="phase-content" id="fase5-content">
-                            <div class="google-form-container">
-                                <div class="locked-overlay">
-                                    <i class="lock-icon">🔒</i>
-                                    <p>Este formulário será liberado em 22/06/2025</p>
-                                </div>
-                            </div>
-                        </div>
+                        <div class="phase-content" id="fase5-content"></div>
                     </div>
                 </div>
             </div>
@@ -197,7 +151,7 @@
     <footer>
         <canvas id="dynamicFooterCanvas"></canvas>
         <div class="container">
-            <p>&copy; 2025 Laboratrorio de Dados da Seduc. Todos os direitos reservados.</p>
+            <p>&copy; 2025 Laboratório de Dados da Seduc. Todos os direitos reservados.</p>
         </div>
     </footer>
 

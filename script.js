@@ -118,11 +118,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 spawnIntervalDecrement: 150
             },
             mobile: {
-                gravity: 0.6,           // Gravidade menor, pulo mais "flutuante"
-                jumpStrength: -14,          // Pulo um pouco mais baixo para compensar
-                initialSpeed: 2.5,        // Jogo começa mais lento
-                speedIncrement: 0.25,       // Velocidade aumenta mais devagar
-                initialSpawnInterval: 2500, // Mais tempo entre os itens
+                gravity: 0.6,
+                jumpStrength: -14,
+                initialSpeed: 2.5,
+                speedIncrement: 0.25,
+                initialSpawnInterval: 2500,
                 spawnIntervalDecrement: 100
             }
         };
@@ -133,18 +133,17 @@ document.addEventListener('DOMContentLoaded', () => {
         let playerY = 0;
         let playerVelocityY = 0;
         let isJumping = false;
-        const gravity = 0.8;
-        const jumpStrength = -15;
-        const playerBaseBottom = 10;
+        const gravity = settings.gravity;
+        const jumpStrength = settings.jumpStrength;
         const playerHeight = 50;
-        let gameSpeed = 3;
+        let gameSpeed = settings.initialSpeed;
         let dataItems = [];
-        let spawnInterval = 2000;
+        let spawnInterval = settings.initialSpawnInterval;
         let dataItemSpawner;
         let animationFrameId;
         let isPaused = false;
 
-        const areaProibida = 110; // altura do Acelera Seduc + pontos
+        const areaProibida = 110;
 
         function jump() {
             if (!isJumping) {
@@ -160,14 +159,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 e.preventDefault();
                 jump();
             }
-        }, { passive: false }); // Adicionado para evitar o aviso de 'passive event listener'
+        }, { passive: false });
+        
         if (player) {
             player.addEventListener('click', jump);
         }
-
-        gameArea.addEventListener('click', (event) => {
-            jump();
-        });
+        gameArea.addEventListener('click', jump);
 
         function spawnDataItem() {
             if (isPaused) return;
@@ -178,17 +175,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const gameAreaHeight = gameArea.clientHeight;
             const itemHeight = 30;
-
             let minSpawnBottom = areaProibida;
             let maxSpawnBottom = gameAreaHeight - itemHeight - 10;
 
-            if (minSpawnBottom > maxSpawnBottom) {
-                minSpawnBottom = areaProibida;
+            if (minSpawnBottom >= maxSpawnBottom) {
                 maxSpawnBottom = minSpawnBottom + 40;
             }
 
             let itemSpawnBottom = minSpawnBottom + Math.random() * (maxSpawnBottom - minSpawnBottom);
-
             dataItem.style.bottom = `${itemSpawnBottom}px`;
 
             dataItemContainer.appendChild(dataItem);
@@ -276,8 +270,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         function restartGame() {
             score = 0;
-            gameSpeed = 3;
-            spawnInterval = 2000;
+            gameSpeed = settings.initialSpeed;
+            spawnInterval = settings.initialSpawnInterval;
             playerY = 0;
             playerVelocityY = 0;
             isJumping = false;
@@ -332,7 +326,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     scoreDisplay.textContent = `Pontos: ${score}`;
                     playCollectSound();
 
-                    gameSpeed += 1.1;
+                    gameSpeed += settings.speedIncrement;
 
                     if (score === 10) {
                         showCongratulationsMessage();
@@ -348,7 +342,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
 
                     if (score % 5 === 0 && score > 0) {
-                        if (spawnInterval > 800) spawnInterval -= 100;
+                        if (spawnInterval > 800) spawnInterval -= settings.spawnIntervalDecrement;
                         clearInterval(dataItemSpawner);
                         dataItemSpawner = setInterval(spawnDataItem, spawnInterval);
                     }
@@ -359,7 +353,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     item.element.remove();
                     dataItems.splice(i, 1);
                     score = 0;
-                    gameSpeed = 3;
+                    gameSpeed = settings.initialSpeed;
                     scoreDisplay.textContent = `Pontos: ${score}`;
                 }
             }
@@ -440,21 +434,11 @@ document.addEventListener('DOMContentLoaded', () => {
         oscillator.stop(context.currentTime + 0.1);
     }
 
-    // Versão para testes - simula horários diferentes
     function getSimulatedDate() {
-        // Data fixada para testes: 01/07/2025
         const testDate = new Date('2025-07-01T' + new Date().toTimeString().split(' ')[0]);
         return testDate;
-        
-        // Descomente uma linha abaixo para testar diferentes horários específicos
-        // return new Date('2025-07-01T08:30:00'); // Simula 8:30 (Credenciamento ativo)
-        // return new Date('2025-07-01T10:30:00'); // Simula 10:30 (Fase 3 ou 4 ativa)
-        // return new Date('2025-07-01T12:30:00'); // Simula 12:30 (Fase 5 ativa)
-        // return new Date('2025-07-01T18:30:00'); // Simula 18:30 (Todas fases encerradas)
-        // return new Date(); // Usar data/hora real
     }
 
-    // Função para inicializar o sistema de fases
     function initPhaseSystem() {
         const phaseHeaders = document.querySelectorAll('.phase-header');
         
@@ -492,8 +476,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 const phase = this.parentElement;
                 const phaseContent = this.nextElementSibling;
                 
-                if (phase.classList.contains('locked') || phase.classList.contains('unavailable')) {
-                    showLockedNotification(this.dataset.phase);
+                if (phase.classList.contains('locked') || phase.classList.contains('unavailable') || phase.classList.contains('completed')) {
+                    if (!phase.classList.contains('completed')) {
+                        showLockedNotification(this.dataset.phase);
+                    }
                     return;
                 }
                 
@@ -511,14 +497,24 @@ document.addEventListener('DOMContentLoaded', () => {
                         const formContainer = phaseContent.querySelector('.form-ready');
                         if (formContainer && !phaseContent.querySelector('.form-loaded')) {
                             const formUrl = formContainer.dataset.formUrl;
+                            const phaseId = this.dataset.phase;
                             
-                            // Carrega o iframe
                             formContainer.innerHTML = `
                                 <div class="google-form-container form-loaded">
                                     <iframe src="${formUrl}" class="google-form-iframe" frameborder="0" marginheight="0" marginwidth="0">Carregando…</iframe>
                                 </div>
                             `;
-                            formContainer.classList.remove('form-ready');
+                            
+                            const iframe = formContainer.querySelector('iframe');
+                            let isInitialLoad = true;
+
+                            iframe.onload = () => {
+                                if (isInitialLoad) {
+                                    isInitialLoad = false;
+                                    return;
+                                }
+                                markPhaseAsCompleted(phaseId);
+                            };
                         }
                     }
                 }
@@ -527,6 +523,59 @@ document.addEventListener('DOMContentLoaded', () => {
         
         checkPhaseReleases();
         setInterval(checkPhaseReleases, 60000);
+        window.addEventListener('focus', checkCompletedPhases);
+        checkCompletedPhases();
+    }
+
+    function markPhaseAsCompleted(phaseId) {
+        const phaseHeader = document.querySelector(`.phase-header[data-phase="${phaseId}"]`);
+        if (!phaseHeader) return;
+
+        const phaseElement = phaseHeader.parentElement;
+        const phaseContent = document.getElementById(`${phaseId}-content`);
+
+        if (phaseContent) {
+            phaseContent.style.display = 'none';
+            phaseHeader.classList.add('collapsed');
+        }
+
+        phaseElement.classList.remove('active');
+        phaseElement.classList.add('completed');
+        
+        const statusBadge = phaseHeader.querySelector('.status-badge');
+        if (statusBadge) {
+            statusBadge.textContent = "Concluído";
+            statusBadge.className = "status-badge completed";
+        }
+        
+        const toggleIcon = phaseHeader.querySelector('.toggle-icon');
+        if (toggleIcon) toggleIcon.textContent = '✔';
+
+        let completedPhases = JSON.parse(localStorage.getItem('completedPhases')) || [];
+        if (!completedPhases.includes(phaseId)) {
+            completedPhases.push(phaseId);
+            localStorage.setItem('completedPhases', JSON.stringify(completedPhases));
+        }
+    }
+
+    function checkCompletedPhases() {
+        let completedPhases = JSON.parse(localStorage.getItem('completedPhases')) || [];
+        completedPhases.forEach(phaseId => {
+            const phaseHeader = document.querySelector(`.phase-header[data-phase="${phaseId}"]`);
+            if (phaseHeader && !phaseHeader.parentElement.classList.contains('completed')) {
+                 const phaseElement = phaseHeader.parentElement;
+                 phaseElement.classList.remove('active', 'locked', 'unavailable');
+                 phaseElement.classList.add('completed');
+                 
+                 const statusBadge = phaseHeader.querySelector('.status-badge');
+                 if (statusBadge) {
+                    statusBadge.textContent = "Concluído";
+                    statusBadge.className = "status-badge completed";
+                 }
+                 const toggleIcon = phaseHeader.querySelector('.toggle-icon');
+                 if (toggleIcon) toggleIcon.textContent = '✔';
+            }
+        });
     }
 
     function showLockedNotification(phaseId) {
@@ -574,6 +623,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!phaseHeaderElement) return;
             
             const phase = phaseHeaderElement.parentElement;
+            if (phase.classList.contains('completed')) return;
+
             const statusBadge = phaseHeaderElement.querySelector('.status-badge');
             const releaseInfo = phaseHeaderElement.querySelector('.release-date');
             const phaseContent = document.getElementById(`${phaseId}-content`);
@@ -636,12 +687,12 @@ document.addEventListener('DOMContentLoaded', () => {
         phaseElement.classList.add('active');
         
         const formURLs = {
-            "credenciamento": "https://forms.gle/credID", // Manter como link externo se não tiver URL embed
-            "fase1": "https://docs.google.com/forms/d/e/1FAIpQLSfq500yzfcUISfkuS5YX4tINdlKyCxUh2pumWY3ui3Dy7p7Ww/viewform?embedded=true",
-            "fase2": "https://docs.google.com/forms/d/e/1FAIpQLScTBHQA2Qq7TQ2VnfAcRtgusPefEInCDc6bNcs_Nz0LK_QOUw/viewform?embedded=true",
-            "fase3": "https://docs.google.com/forms/d/e/1FAIpQLSeDByPCt1tJoRcYB7M2pTKYSeXk0IfYBiBAug1EhhHNL2F3Vg/viewform?embedded=true",
-            "fase4": "https://docs.google.com/forms/d/e/1FAIpQLSfwxyaJmYKfG-61o_AM_aIKAjcgxba8hEBCqdaW5GcxYiP4Wg/viewform?embedded=true",
-            "fase5": "https://forms.gle/fase5ID" // Manter como link externo se não tiver URL embed
+            "credenciamento": "https://docs.google.com/forms/d/e/1FAIpQLSdFVowu6LE4EypsOQ5QlcwgKacCWKXYI8N30C7L3aRWegZY4g/viewform?embedded=true",
+            "fase1": "https://docs.google.com/forms/d/e/1FAIpQLSdFVowu6LE4EypsOQ5QlcwgKacCWKXYI8N30C7L3aRWegZY4g/viewform?embedded=true",
+            "fase2": "https://docs.google.com/forms/d/e/1FAIpQLSdFVowu6LE4EypsOQ5QlcwgKacCWKXYI8N30C7L3aRWegZY4g/viewform?embedded=true",
+            "fase3": "https://docs.google.com/forms/d/e/1FAIpQLSdFVowu6LE4EypsOQ5QlcwgKacCWKXYI8N30C7L3aRWegZY4g/viewform?embedded=true",
+            "fase4": "https://docs.google.com/forms/d/e/1FAIpQLSdFVowu6LE4EypsOQ5QlcwgKacCWKXYI8N30C7L3aRWegZY4g/viewform?embedded=true",
+            "fase5": "https://docs.google.com/forms/d/e/1FAIpQLSdFVowu6LE4EypsOQ5QlcwgKacCWKXYI8N30C7L3aRWegZY4g/viewform?embedded=true"
         };
         
         const lockedOverlay = phaseContent.querySelector('.locked-overlay, .unavailable-overlay');
@@ -681,6 +732,7 @@ document.addEventListener('DOMContentLoaded', () => {
         .status-badge.locked { background-color: #9e9e9e; }
         .status-badge.available { background-color: #4CAF50; }
         .status-badge.unavailable { background-color: #f44336; }
+        .status-badge.completed { background-color: #9c27b0; }
         .form-phase { border-left: 5px solid #ccc; margin-bottom: 10px; }
         .form-phase.locked { border-left-color: #9e9e9e !important; }
         .form-phase.locked .phase-header { color: #757575; cursor: not-allowed; }
@@ -689,6 +741,9 @@ document.addEventListener('DOMContentLoaded', () => {
         .form-phase.active .phase-header:hover { background-color: #f5f5f5; }
         .form-phase.unavailable { border-left-color: #f44336 !important; opacity: 0.8; }
         .form-phase.unavailable .phase-header { color: #f44336; cursor: not-allowed; }
+        .form-phase.completed { border-left-color: #9c27b0 !important; }
+        .form-phase.completed .phase-header { color: #9c27b0; cursor: default; }
+        .form-phase.completed .phase-header:hover { background-color: #fafafa; }
         .phase-header { display: flex; align-items: center; justify-content: space-between; padding: 15px 20px; background-color: #fafafa; border-bottom: 1px solid #e0e0e0; transition: background-color 0.2s ease; flex-wrap: wrap; gap: 10px; }
         .phase-header h4 { margin: 0; flex-grow: 1; min-width: 0; }
         .phase-header-info { display: flex; align-items: center; flex-wrap: wrap; gap: 5px; }
