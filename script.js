@@ -105,7 +105,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const gameArea = document.getElementById('navbarGame');
     const instructions = document.getElementById('instructions');
 
-    if (player && dataItemContainer && scoreDisplay && gameArea && instructions) {
+    if (player && dataItemContainer && scoreDisplay && gameArea) {
         const isMobile = window.innerWidth <= 768;
         
         const gameSettings = {
@@ -531,7 +531,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function showLockedNotification(phaseId) {
         const schedule = {
-            "inscricao": { start: createDateForToday("07:00:00"), end: createDateForToday("09:00:00") }
+            "inscricao": { start: createDateForToday("07:00:00"), end: createDateForToday("09:00:00") },
+            "fase1": { start: createDateForToday("09:00:00"), end: createDateForToday("20:00:00") },
+            "fase2": { start: createDateForToday("12:00:00"), end: createDateForToday("20:00:00") },
+            "fase3": { start: createDateForToday("13:30:00"), end: createDateForToday("20:00:00") },
+            "fase4": { start: createDateForToday("15:30:00"), end: createDateForToday("20:00:00") },
+            "fase-secreta": { start: createDateForToday("15:30:00"), end: createDateForToday("20:00:00") }
         };
         const phaseSchedule = schedule[phaseId];
         if (!phaseSchedule) {
@@ -550,9 +555,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function checkPhaseReleases() {
         const schedule = {
-            "inscricao": { start: createDateForToday("07:00:00"), end: createDateForToday("09:00:00") }
+            "inscricao": { start: createDateForToday("07:00:00"), end: createDateForToday("09:00:00") },
+            "fase1": { start: createDateForToday("09:00:00"), end: createDateForToday("20:00:00") },
+            "fase2": { start: createDateForToday("12:00:00"), end: createDateForToday("20:00:00") },
+            "fase3": { start: createDateForToday("13:30:00"), end: createDateForToday("20:00:00") },
+            "fase4": { start: createDateForToday("15:30:00"), end: createDateForToday("20:00:00") },
+            "fase-secreta": { start: createDateForToday("15:30:00"), end: createDateForToday("20:00:00") }
         };
-        const allPhases = ["inscricao", "fase1", "fase2", "fase3", "fase4", "fase5"];
+        const allPhases = ["inscricao", "fase1", "fase2", "fase3", "fase4", "fase-secreta"];
         const currentDate = getSimulatedDate();
         allPhases.forEach(phaseId => {
             const phaseHeaderElement = document.querySelector(`.form-phase .phase-header[data-phase="${phaseId}"]`);
@@ -562,40 +572,31 @@ document.addEventListener('DOMContentLoaded', () => {
             const releaseInfo = phaseHeaderElement.querySelector('.release-date');
             const phaseContent = document.getElementById(`${phaseId}-content`);
             const formatTime = (date) => date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-            if (phaseId === "inscricao") {
-                const timeWindow = schedule["inscricao"];
-                if (currentDate >= timeWindow.start && currentDate < timeWindow.end) {
-                    phase.classList.remove('locked', 'unavailable');
-                    phase.classList.add('active');
-                    if (statusBadge) { statusBadge.textContent = "Disponível"; statusBadge.className = "status-badge available"; }
-                    if (releaseInfo) { releaseInfo.textContent = `Disponível até: ${formatTime(timeWindow.end)}`; releaseInfo.className = "release-date available-time"; }
-                    unlockPhase(phaseId);
-                } else if (currentDate < timeWindow.start) {
-                    phase.classList.remove('active', 'unavailable');
-                    phase.classList.add('locked');
-                    if (statusBadge) { statusBadge.textContent = "Bloqueado"; statusBadge.className = "status-badge locked"; }
-                    if (releaseInfo) { releaseInfo.textContent = `Liberação: ${formatTime(timeWindow.start)}`; }
-                    if (phaseContent) {
-                        phaseContent.style.display = 'none';
-                        phaseHeaderElement.classList.add('collapsed');
-                    }
-                } else {
-                    phase.classList.remove('active', 'locked');
-                    phase.classList.add('unavailable');
-                    if (statusBadge) { statusBadge.textContent = "Encerrado"; statusBadge.className = "status-badge unavailable"; }
-                    if (releaseInfo) { releaseInfo.textContent = `Encerrado às ${formatTime(timeWindow.end)}`; releaseInfo.className = "release-date unavailable-time"; }
-                    if (phaseContent) {
-                        phaseContent.style.display = 'none';
-                        phaseHeaderElement.classList.add('collapsed');
-                    }
-                }
-            } else {
-                // Todas as outras fases sempre ativas
+            const timeWindow = schedule[phaseId];
+            if (currentDate >= timeWindow.start && currentDate < timeWindow.end) {
                 phase.classList.remove('locked', 'unavailable');
                 phase.classList.add('active');
                 if (statusBadge) { statusBadge.textContent = "Disponível"; statusBadge.className = "status-badge available"; }
-                if (releaseInfo) { releaseInfo.textContent = ""; }
+                if (releaseInfo) { releaseInfo.textContent = `Disponível até: ${formatTime(timeWindow.end)}`; releaseInfo.className = "release-date available-time"; }
                 unlockPhase(phaseId);
+            } else if (currentDate < timeWindow.start) {
+                phase.classList.remove('active', 'unavailable');
+                phase.classList.add('locked');
+                if (statusBadge) { statusBadge.textContent = "Bloqueado"; statusBadge.className = "status-badge locked"; }
+                if (releaseInfo) { releaseInfo.textContent = `Liberação: ${formatTime(timeWindow.start)}`; }
+                if (phaseContent) {
+                    phaseContent.style.display = 'none';
+                    phaseHeaderElement.classList.add('collapsed');
+                }
+            } else {
+                phase.classList.remove('active', 'locked');
+                phase.classList.add('unavailable');
+                if (statusBadge) { statusBadge.textContent = "Encerrado"; statusBadge.className = "status-badge unavailable"; }
+                if (releaseInfo) { releaseInfo.textContent = `Encerrado às ${formatTime(timeWindow.end)}`; releaseInfo.className = "release-date unavailable-time"; }
+                if (phaseContent) {
+                    phaseContent.style.display = 'none';
+                    phaseHeaderElement.classList.add('collapsed');
+                }
             }
         });
     }
@@ -614,7 +615,7 @@ document.addEventListener('DOMContentLoaded', () => {
             "fase2": "https://docs.google.com/forms/d/e/1FAIpQLSdFVowu6LE4EypsOQ5QlcwgKacCWKXYI8N30C7L3aRWegZY4g/viewform?embedded=true",
             "fase3": "https://docs.google.com/forms/d/e/1FAIpQLSdFVowu6LE4EypsOQ5QlcwgKacCWKXYI8N30C7L3aRWegZY4g/viewform?embedded=true",
             "fase4": "https://docs.google.com/forms/d/e/1FAIpQLSdFVowu6LE4EypsOQ5QlcwgKacCWKXYI8N30C7L3aRWegZY4g/viewform?embedded=true",
-            "fase5": "https://docs.google.com/forms/d/e/1FAIpQLSdFVowu6LE4EypsOQ5QlcwgKacCWKXYI8N30C7L3aRWegZY4g/viewform?embedded=true"
+            "fase-secreta": "https://docs.google.com/forms/d/e/1FAIpQLSdFVowu6LE4EypsOQ5QlcwgKacCWKXYI8N30C7L3aRWegZY4g/viewform?embedded=true"
         };
         const lockedOverlay = phaseContent.querySelector('.locked-overlay, .unavailable-overlay');
         if (lockedOverlay) lockedOverlay.remove();
