@@ -532,11 +532,11 @@ document.addEventListener('DOMContentLoaded', () => {
     function showLockedNotification(phaseId) {
         const schedule = {
             "credenciamento": { start: createDateForToday("07:00:00"), end: createDateForToday("09:00:00") },
-            "fase1": { start: createDateForToday("09:00:00"), end: createDateForToday("10:00:00") },
-            "fase2": { start: createDateForToday("09:00:00"), end: createDateForToday("10:00:00") },
-            "fase3": { start: createDateForToday("10:00:00"), end: createDateForToday("10:30:00") },
-            "fase4": { start: createDateForToday("10:30:00"), end: createDateForToday("11:00:00") },
-            "fase5": { start: createDateForToday("11:00:00"), end: createDateForToday("12:30:00") }
+            "fase1": { start: createDateForToday("09:00:00"), end: createDateForToday("14:00:00") },
+            "fase2": { start: createDateForToday("09:00:00"), end: createDateForToday("14:00:00") },
+            "fase3": { start: createDateForToday("10:00:00"), end: createDateForToday("14:30:00") },
+            "fase4": { start: createDateForToday("10:30:00"), end: createDateForToday("14:00:00") },
+            "fase5": { start: createDateForToday("11:00:00"), end: createDateForToday("14:30:00") }
         };
         
         const phaseSchedule = schedule[phaseId];
@@ -560,11 +560,11 @@ document.addEventListener('DOMContentLoaded', () => {
     function checkPhaseReleases() {
         const schedule = {
             "credenciamento": { start: createDateForToday("07:00:00"), end: createDateForToday("09:00:00") },
-            "fase1": { start: createDateForToday("09:00:00"), end: createDateForToday("10:00:00") },
-            "fase2": { start: createDateForToday("09:00:00"), end: createDateForToday("10:00:00") },
-            "fase3": { start: createDateForToday("10:00:00"), end: createDateForToday("10:30:00") },
-            "fase4": { start: createDateForToday("10:30:00"), end: createDateForToday("11:00:00") },
-            "fase5": { start: createDateForToday("11:00:00"), end: createDateForToday("12:30:00") }
+            "fase1": { start: createDateForToday("11:00:00"), end: createDateForToday("14:00:00") },
+            "fase2": { start: createDateForToday("11:00:00"), end: createDateForToday("14:00:00") },
+            "fase3": { start: createDateForToday("11:00:00"), end: createDateForToday("14:30:00") },
+            "fase4": { start: createDateForToday("11:30:00"), end: createDateForToday("14:00:00") },
+            "fase5": { start: createDateForToday("11:00:00"), end: createDateForToday("14:30:00") }
         };
         
         const currentDate = getSimulatedDate();
