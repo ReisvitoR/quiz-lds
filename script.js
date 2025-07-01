@@ -106,6 +106,29 @@ document.addEventListener('DOMContentLoaded', () => {
     const instructions = document.getElementById('instructions');
 
     if (player && dataItemContainer && scoreDisplay && gameArea && instructions) {
+        const isMobile = window.innerWidth <= 768;
+        
+        const gameSettings = {
+            desktop: {
+                gravity: 0.8,
+                jumpStrength: -15,
+                initialSpeed: 3,
+                speedIncrement: 0.5,
+                initialSpawnInterval: 2000,
+                spawnIntervalDecrement: 150
+            },
+            mobile: {
+                gravity: 0.6,           // Gravidade menor, pulo mais "flutuante"
+                jumpStrength: -14,          // Pulo um pouco mais baixo para compensar
+                initialSpeed: 2.5,        // Jogo começa mais lento
+                speedIncrement: 0.25,       // Velocidade aumenta mais devagar
+                initialSpawnInterval: 2500, // Mais tempo entre os itens
+                spawnIntervalDecrement: 100
+            }
+        };
+        
+        const settings = isMobile ? gameSettings.mobile : gameSettings.desktop;
+
         let score = 0;
         let playerY = 0;
         let playerVelocityY = 0;
@@ -141,7 +164,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (player) {
             player.addEventListener('click', jump);
         }
-        
+
         gameArea.addEventListener('click', (event) => {
             jump();
         });
