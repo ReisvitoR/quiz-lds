@@ -637,11 +637,11 @@ document.addEventListener('DOMContentLoaded', () => {
         
         const formURLs = {
             "credenciamento": "https://forms.gle/credID", // Manter como link externo se não tiver URL embed
-            "fase1": "https://docs.google.com/forms/d/e/1FAIpQLSfq500yzfcUISfkuS5YX4tINdlKyCxUh2pumWY3ui3Dy7p7Ww/viewform?embedded=true",
-            "fase2": "https://docs.google.com/forms/d/e/1FAIpQLScTBHQA2Qq7TQ2VnfAcRtgusPefEInCDc6bNcs_Nz0LK_QOUw/viewform?embedded=true",
-            "fase3": "https://docs.google.com/forms/d/e/1FAIpQLSeDByPCt1tJoRcYB7M2pTKYSeXk0IfYBiBAug1EhhHNL2F3Vg/viewform?embedded=true",
-            "fase4": "https://docs.google.com/forms/d/e/1FAIpQLSfwxyaJmYKfG-61o_AM_aIKAjcgxba8hEBCqdaW5GcxYiP4Wg/viewform?embedded=true",
-            "fase5": "https://forms.gle/fase5ID" // Manter como link externo se não tiver URL embed
+            "fase1": "https://docs.google.com/forms/d/e/1FAIpQLSdFVowu6LE4EypsOQ5QlcwgKacCWKXYI8N30C7L3aRWegZY4g/viewform?embedded=true",
+            "fase2": "https://docs.google.com/forms/d/e/1FAIpQLSdFVowu6LE4EypsOQ5QlcwgKacCWKXYI8N30C7L3aRWegZY4g/viewform?embedded=true",
+            "fase3": "https://docs.google.com/forms/d/e/1FAIpQLSdFVowu6LE4EypsOQ5QlcwgKacCWKXYI8N30C7L3aRWegZY4g/viewform?embedded=true",
+            "fase4": "https://docs.google.com/forms/d/e/1FAIpQLSdFVowu6LE4EypsOQ5QlcwgKacCWKXYI8N30C7L3aRWegZY4g/viewform?embedded=true",
+            "fase5": "https://docs.google.com/forms/d/e/1FAIpQLSdFVowu6LE4EypsOQ5QlcwgKacCWKXYI8N30C7L3aRWegZY4g/viewform?embedded=true" // Manter como link externo se não tiver URL embed
         };
         
         const lockedOverlay = phaseContent.querySelector('.locked-overlay, .unavailable-overlay');
