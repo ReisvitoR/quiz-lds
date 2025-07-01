@@ -435,6 +435,43 @@ document.addEventListener('DOMContentLoaded', () => {
         // Configurar cliques nos headers para expandir/colapsar
         const phaseHeaders = document.querySelectorAll('.phase-header');
         
+        // Função para reorganizar headers para dispositivos móveis
+        function reorganizeHeadersForMobile() {
+            phaseHeaders.forEach(header => {
+                // Verificar se já foi reorganizado
+                if (header.querySelector('.phase-header-info')) return;
+                
+                // Buscar elementos existentes
+                const statusBadge = header.querySelector('.status-badge');
+                const releaseDate = header.querySelector('.release-date');
+                const toggleIcon = header.querySelector('.toggle-icon');
+                
+                // Criar container para informações
+                const infoContainer = document.createElement('div');
+                infoContainer.className = 'phase-header-info';
+                
+                // Mover elementos para o container
+                if (statusBadge) infoContainer.appendChild(statusBadge);
+                if (releaseDate) infoContainer.appendChild(releaseDate);
+                if (toggleIcon) infoContainer.appendChild(toggleIcon);
+                
+                // Adicionar o container ao header
+                header.appendChild(infoContainer);
+            });
+        }
+        
+        // Aplicar reorganização inicial
+        reorganizeHeadersForMobile();
+        
+        // Inicialmente colapsar todas as fases
+        phaseHeaders.forEach(header => {
+            const phaseContent = header.nextElementSibling;
+            if (phaseContent) {
+                phaseContent.style.display = 'none';
+                header.classList.add('collapsed');
+            }
+        });
+        
         phaseHeaders.forEach(header => {
             header.addEventListener('click', function() {
                 const phase = this.parentElement;
@@ -446,13 +483,45 @@ document.addEventListener('DOMContentLoaded', () => {
                     return;
                 }
                 
-                // Toggle expand/collapse
-                if (phaseContent.style.display === 'block') {
-                    phaseContent.style.display = 'none';
-                    this.classList.add('collapsed');
-                } else {
-                    phaseContent.style.display = 'block';
-                    this.classList.remove('collapsed');
+                // Toggle expand/collapse apenas para fases ativas
+                if (phase.classList.contains('active')) {
+                    if (phaseContent.style.display === 'block') {
+                        phaseContent.style.display = 'none';
+                        this.classList.add('collapsed');
+                        // Mudar ícone para baixo
+                        const toggleIcon = this.querySelector('.toggle-icon');
+                        if (toggleIcon) toggleIcon.textContent = '▼';
+                    } else {
+                        phaseContent.style.display = 'block';
+                        this.classList.remove('collapsed');
+                        // Mudar ícone para cima
+                        const toggleIcon = this.querySelector('.toggle-icon');
+                        if (toggleIcon) toggleIcon.textContent = '▲';
+                        
+                        // Carregar o formulário se ainda não foi carregado
+                        const formContainer = phaseContent.querySelector('.form-ready');
+                        if (formContainer && !phaseContent.querySelector('iframe')) {
+                            const formUrl = formContainer.dataset.formUrl;
+                            const phaseId = this.dataset.phase;
+                            
+                            formContainer.innerHTML = `
+                                <iframe 
+                                    src="${formUrl}" 
+                                    width="100%" 
+                                    height="600" 
+                                    frameborder="0" 
+                                    marginheight="0" 
+                                    marginwidth="0"
+                                    allowfullscreen="true"
+                                    loading="lazy"
+                                    style="border: none; border-radius: 6px;">
+                                    Carregando…
+                                </iframe>
+                                <p class="form-note"><strong>Nota:</strong> Data Quiz - ${phaseId.charAt(0).toUpperCase() + phaseId.slice(1)}</p>
+                            `;
+                            formContainer.classList.remove('form-ready');
+                        }
+                    }
                 }
             });
         });
@@ -591,6 +660,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     releaseInfo.className = "release-date available-time";
                 }
                 
+                // Atualizar ícone para indicar que pode ser expandido
+                const toggleIcon = phaseHeaderElement.querySelector('.toggle-icon');
+                if (toggleIcon && phaseContent && phaseContent.style.display !== 'block') {
+                    toggleIcon.textContent = '▼';
+                }
+                
                 unlockPhase(phaseId);
 
             } 
@@ -611,12 +686,24 @@ document.addEventListener('DOMContentLoaded', () => {
                     const newReleaseInfo = document.createElement('span');
                     newReleaseInfo.className = "release-date";
                     newReleaseInfo.textContent = `Liberação: ${formatTime(timeWindow.start)}`;
-                    phaseHeaderElement.insertBefore(newReleaseInfo, phaseHeaderElement.querySelector('.toggle-icon'));
+                    
+                    // Inserir no container correto para dispositivos móveis
+                    const infoContainer = phaseHeaderElement.querySelector('.phase-header-info');
+                    const toggleIcon = phaseHeaderElement.querySelector('.toggle-icon');
+                    
+                    if (infoContainer && toggleIcon) {
+                        infoContainer.insertBefore(newReleaseInfo, toggleIcon);
+                    } else {
+                        phaseHeaderElement.insertBefore(newReleaseInfo, phaseHeaderElement.querySelector('.toggle-icon'));
+                    }
                 }
 
+                // Garantir que a fase fique colapsada e com ícone bloqueado
                 if (phaseContent) {
                     phaseContent.style.display = 'none'; 
-                    phaseHeaderElement.classList.add('collapsed'); 
+                    phaseHeaderElement.classList.add('collapsed');
+                    const toggleIcon = phaseHeaderElement.querySelector('.toggle-icon');
+                    if (toggleIcon) toggleIcon.textContent = '🔒';
                 }
             } 
             else {
@@ -634,17 +721,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     releaseInfo.className = "release-date unavailable-time";
                 }
                 
+                // Garantir que a fase fique colapsada e com ícone de encerrado
                 if (phaseContent) {
-                    phaseContent.innerHTML = `
-                        <div class="google-form-container">
-                            <div class="unavailable-overlay">
-                                <i class="unavailable-icon">⏱️</i>
-                                <p>Este formulário foi encerrado às ${formatTime(timeWindow.end)}</p>
-                            </div>
-                        </div>
-                    `;
-                    phaseContent.style.display = 'block'; 
-                    phaseHeaderElement.classList.remove('collapsed'); 
+                    phaseContent.style.display = 'none'; 
+                    phaseHeaderElement.classList.add('collapsed');
+                    const toggleIcon = phaseHeaderElement.querySelector('.toggle-icon');
+                    if (toggleIcon) toggleIcon.textContent = '⏱️';
                 }
             }
         });
@@ -663,7 +745,7 @@ document.addEventListener('DOMContentLoaded', () => {
         phaseElement.classList.remove('locked', 'unavailable');
         phaseElement.classList.add('active');
         
-        // Carregar o formulário apropriado
+        // Carregar o formulário apropriado apenas quando necessário
         const formURLs = {
             "credenciamento": "https://forms.gle/credID",
             "fase1": "https://docs.google.com/forms/d/e/1FAIpQLSfq500yzfcUISfkuS5YX4tINdlKyCxUh2pumWY3ui3Dy7p7Ww/viewform",
@@ -677,30 +759,33 @@ document.addEventListener('DOMContentLoaded', () => {
         const lockedOverlay = phaseContent.querySelector('.locked-overlay, .unavailable-overlay');
         if (lockedOverlay) lockedOverlay.remove();
         
-        // Verificar se já existe um iframe
-        if (!phaseContent.querySelector('iframe')) {
-            // Carregar o iframe com o formulário
+        // Preparar conteúdo para ser carregado quando expandido
+        if (!phaseContent.querySelector('iframe') && !phaseContent.querySelector('.form-ready')) {
+            // Marcar como pronto para carregar o formulário
             phaseContent.innerHTML = `
-                <div class="google-form-container">
-                    <iframe 
-                        src="${formURLs[phaseId]}" 
-                        width="100%" 
-                        height="600" 
-                        frameborder="0" 
-                        marginheight="0" 
-                        marginwidth="0"
-                        allowfullscreen="true"
-                        loading="lazy">
-                        Carregando…
-                    </iframe>
-                    <p class="form-note"><strong>Nota:</strong> Data Quiz - ${phaseId.charAt(0).toUpperCase() + phaseId.slice(1)}</p>
+                <div class="google-form-container form-ready" data-form-url="${formURLs[phaseId]}">
+                    <div class="loading-message">
+                        <p>Carregando formulário...</p>
+                    </div>
                 </div>
             `;
         }
+        
+        // Garantir que a fase inicie colapsada mesmo quando ativa
+        phaseContent.style.display = 'none';
+        phaseHeader.classList.add('collapsed');
     }
 
     // Inicialização do sistema de fases
     initPhaseSystem();
+
+    // Garantir que existe meta viewport para responsividade
+    if (!document.querySelector('meta[name="viewport"]')) {
+        const viewport = document.createElement('meta');
+        viewport.name = 'viewport';
+        viewport.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no';
+        document.head.appendChild(viewport);
+    }
 
     const styleSheet = document.createElement("style");
     styleSheet.type = "text/css";
@@ -741,6 +826,7 @@ document.addEventListener('DOMContentLoaded', () => {
         .form-phase {
             /* Default border, can be overridden */
             border-left: 5px solid #ccc; 
+            margin-bottom: 10px;
         }
 
         .form-phase.locked {
@@ -748,6 +834,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         .form-phase.locked .phase-header {
             color: #757575; /* Cinza para o nome da fase */
+            cursor: not-allowed;
         }
 
         .form-phase.active {
@@ -755,6 +842,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         .form-phase.active .phase-header {
             color: #4CAF50; /* Verde para o nome da fase */
+            cursor: pointer;
+        }
+        .form-phase.active .phase-header:hover {
+            background-color: #f5f5f5;
         }
         
         .form-phase.unavailable {
@@ -763,11 +854,58 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         .form-phase.unavailable .phase-header {
             color: #f44336; /* Vermelho para o nome da fase */
+            cursor: not-allowed;
         }
         
-        /* Cor do ícone de toggle - para não herdar a cor do estado */
+        /* Estilização do header das fases */
+        .phase-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px 20px;
+            background-color: #fafafa;
+            border-bottom: 1px solid #e0e0e0;
+            transition: background-color 0.2s ease;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .phase-header h4 {
+            margin: 0;
+            flex-grow: 1;
+            min-width: 0; /* Permite que o texto seja truncado se necessário */
+        }
+        
+        /* Container para badges e ícones */
+        .phase-header-info {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+        
+        /* Cor do ícone de toggle */
         .phase-header .toggle-icon {
-            color: #333; /* Ou outra cor neutra desejada */
+            color: #666;
+            font-size: 16px;
+            margin-left: 10px;
+            transition: transform 0.2s ease;
+            flex-shrink: 0;
+        }
+        
+        .phase-header.collapsed .toggle-icon {
+            transform: rotate(0deg);
+        }
+        
+        .phase-header:not(.collapsed) .toggle-icon {
+            transform: rotate(180deg);
+        }
+        
+        .release-date {
+            font-size: 0.8em;
+            margin-left: 10px;
+            margin-right: 10px;
+            white-space: nowrap;
         }
         
         .release-date.unavailable-time {
@@ -777,6 +915,16 @@ document.addEventListener('DOMContentLoaded', () => {
         .release-date.available-time {
             color: #4CAF50; /* Mantém verde para data de disponibilidade */
             font-weight: 500;
+        }
+        
+        .loading-message {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+            background: rgba(245,245,245,0.9);
+            border-radius: 6px;
+            color: #666;
         }
         
         .unavailable-overlay {
@@ -794,6 +942,143 @@ document.addEventListener('DOMContentLoaded', () => {
         .unavailable-icon {
             font-size: 40px;
             margin-bottom: 15px;
+        }
+        
+        /* Estilização para iframe dos formulários */
+        .google-form-container iframe {
+            width: 100%;
+            height: 600px;
+            border: none;
+            border-radius: 6px;
+        }
+        
+        .form-note {
+            margin-top: 10px;
+            font-size: 0.9em;
+            color: #666;
+            text-align: center;
+        }
+
+        /* RESPONSIVIDADE PARA DISPOSITIVOS MÓVEIS */
+        @media (max-width: 768px) {
+            .phase-header {
+                padding: 12px 15px;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+            
+            .phase-header h4 {
+                font-size: 1.1em;
+                width: 100%;
+            }
+            
+            .phase-header-info {
+                width: 100%;
+                justify-content: space-between;
+                align-items: center;
+            }
+            
+            .status-badge {
+                font-size: 0.75em;
+                padding: 3px 6px;
+                margin-left: 0;
+            }
+            
+            .release-date {
+                font-size: 0.75em;
+                margin: 0;
+                flex-grow: 1;
+                text-align: center;
+            }
+            
+            .phase-header .toggle-icon {
+                margin-left: 0;
+                font-size: 18px;
+            }
+            
+            .google-form-container iframe {
+                height: 500px;
+            }
+            
+            .loading-message {
+                height: 150px;
+                font-size: 0.9em;
+            }
+            
+            .unavailable-overlay {
+                height: 150px;
+                padding: 20px;
+            }
+            
+            .unavailable-icon {
+                font-size: 30px;
+                margin-bottom: 10px;
+            }
+            
+            .form-note {
+                font-size: 0.8em;
+                margin-top: 8px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .phase-header {
+                padding: 10px 12px;
+            }
+            
+            .phase-header h4 {
+                font-size: 1em;
+            }
+            
+            .status-badge {
+                font-size: 0.7em;
+                padding: 2px 5px;
+            }
+            
+            .release-date {
+                font-size: 0.7em;
+            }
+            
+            .google-form-container iframe {
+                height: 450px;
+            }
+            
+            .loading-message,
+            .unavailable-overlay {
+                height: 120px;
+                font-size: 0.85em;
+            }
+            
+            .unavailable-icon {
+                font-size: 25px;
+                margin-bottom: 8px;
+            }
+            
+            .form-note {
+                font-size: 0.75em;
+                margin-top: 6px;
+                padding: 0 10px;
+            }
+        }
+
+        /* Ajustes para orientação landscape em celulares */
+        @media (max-width: 768px) and (orientation: landscape) {
+            .google-form-container iframe {
+                height: 400px;
+            }
+        }
+        
+        /* Melhorias para touch devices */
+        @media (hover: none) and (pointer: coarse) {
+            .phase-header {
+                min-height: 44px; /* Área mínima de toque recomendada */
+                -webkit-tap-highlight-color: rgba(0,0,0,0.1);
+            }
+            
+            .form-phase.active .phase-header:active {
+                background-color: #e8e8e8;
+            }
         }
     `;
     document.head.appendChild(styleSheet);
