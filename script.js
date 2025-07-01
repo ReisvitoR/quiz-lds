@@ -593,7 +593,7 @@ document.addEventListener('DOMContentLoaded', () => {
         phaseElement.classList.add('active');
 
         const formURLs = {
-            "fase1": "https://docs.google.com/forms/d/e/1FAIpQLSdFVowu6LE4EypsOQ5QlcwgKacCWKXYI8N30C7L3aRWegZY4g/viewform?embedded=true",
+            "fase1": "https://docs.google.com/forms/d/e/1FAIpQLSfq500yzfcUISfkuS5YX4tINdlKyCxUh2pumWY3ui3Dy7p7Ww/viewform?embedded=true",
             "fase2": "https://docs.google.com/forms/d/e/1FAIpQLScTBHQA2Qq7TQ2VnfAcRtgusPefEInCDc6bNcs_Nz0LK_QOUw/viewform?embedded=true",
             "fase3": "https://docs.google.com/forms/d/e/1FAIpQLSeDByPCt1tJoRcYB7M2pTKYSeXk0IfYBiBAug1EhhHNL2F3Vg/viewform?embedded=true",
             "fase4": "https://docs.google.com/forms/d/e/1FAIpQLSfwxyaJmYKfG-61o_AM_aIKAjcgxba8hEBCqdaW5GcxYiP4Wg/viewform?embedded=true"
