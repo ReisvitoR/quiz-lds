@@ -1,12 +1,12 @@
 document.addEventListener('DOMContentLoaded', () => {
     console.log("lAB Dados Seduc");
 
-    // Helper function to create Date objects for today with specific times
+    // Helper function to create Date objects for 01/07/2025 with specific times
     function createDateForToday(timeString) { // e.g., "07:00:00"
-        const today = new Date();
+        const testDate = new Date('2025-07-01');
         const [hours, minutes, seconds] = timeString.split(':').map(Number);
-        today.setHours(hours, minutes, seconds, 0);
-        return today;
+        testDate.setHours(hours, minutes, seconds, 0);
+        return testDate;
     }
 
     // --- Particle Class Definition (used by manageParticleCanvas) ---
@@ -418,12 +418,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Versão para testes - simula horários diferentes
     function getSimulatedDate() {
-        // Descomente uma linha abaixo para testar diferentes horários
-        // return createDateForToday("08:30:00"); // Simula 8:30 (Credenciamento ativo)
-        // return createDateForToday("10:30:00"); // Simula 10:30 (Fase 3 ou 4 ativa)
-        // return createDateForToday("12:30:00"); // Simula 12:30 (Fase 5 ativa)
-        // return createDateForToday("18:30:00"); // Simula 18:30 (Todas fases encerradas)
-        return new Date(); // Usar data/hora real
+        // Data fixada para testes: 01/07/2025
+        const testDate = new Date('2025-07-01T' + new Date().toTimeString().split(' ')[0]);
+        return testDate;
+        
+        // Descomente uma linha abaixo para testar diferentes horários específicos
+        // return new Date('2025-07-01T08:30:00'); // Simula 8:30 (Credenciamento ativo)
+        // return new Date('2025-07-01T10:30:00'); // Simula 10:30 (Fase 3 ou 4 ativa)
+        // return new Date('2025-07-01T12:30:00'); // Simula 12:30 (Fase 5 ativa)
+        // return new Date('2025-07-01T18:30:00'); // Simula 18:30 (Todas fases encerradas)
+        // return new Date(); // Usar data/hora real
     }
 
     // Função para inicializar o sistema de fases
@@ -662,10 +666,10 @@ document.addEventListener('DOMContentLoaded', () => {
         // Carregar o formulário apropriado
         const formURLs = {
             "credenciamento": "https://forms.gle/credID",
-            "fase1": "https://forms.gle/fase1ID",
-            "fase2": "https://forms.gle/fase2ID",
-            "fase3": "https://forms.gle/fase3ID",
-            "fase4": "https://forms.gle/fase4ID",
+            "fase1": "https://docs.google.com/forms/d/e/1FAIpQLSfq500yzfcUISfkuS5YX4tINdlKyCxUh2pumWY3ui3Dy7p7Ww/viewform",
+            "fase2": "https://docs.google.com/forms/d/e/1FAIpQLScTBHQA2Qq7TQ2VnfAcRtgusPefEInCDc6bNcs_Nz0LK_QOUw/viewform",
+            "fase3": "https://docs.google.com/forms/d/e/1FAIpQLSeDByPCt1tJoRcYB7M2pTKYSeXk0IfYBiBAug1EhhHNL2F3Vg/viewform",
+            "fase4": "https://docs.google.com/forms/d/e/1FAIpQLSfwxyaJmYKfG-61o_AM_aIKAjcgxba8hEBCqdaW5GcxYiP4Wg/viewform",
             "fase5": "https://forms.gle/fase5ID"
         };
         
