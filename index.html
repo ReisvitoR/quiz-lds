@@ -26,7 +26,6 @@
             <img id="logoAcelera" src="assets/logo_acelera.svg" alt="Logo Acelera Seduc">
             <!--<img id="logoEstado" src="./assets/logo_seduc.svg" alt="Logo Seduc">-->
         </div>
-        <p class="game-call-to-action">🚀 <strong>Clique no foguete</strong>🚀</p>
         <div id="colorBar">
             <div class="color-segment green"></div>
             <div class="color-segment yellow"></div>
@@ -40,6 +39,7 @@
     <main>
         <section id="quiz">
             <div class="container">
+                <p class="game-call-to-action">🚀 <strong>Clique no foguete</strong>🚀</p>
                 <h3>Teste Seus Conhecimentos sobre Dados!</h3>
                 <p>
                     Para obter as respostas utilize a 
@@ -80,14 +80,14 @@
                         <div class="phase-header" data-phase="fase1">
                             <h4>Fase 1</h4>
                             <span class="status-badge locked">Bloqueado</span>
-                            <span class="release-date">Liberação: 25/05/2025</span>
+                            <span class="release-date">Liberação: 09:00</span>
                             <span class="toggle-icon">▼</span>
                         </div>
                         <div class="phase-content" id="fase1-content">
                             <div class="google-form-container">
                                 <div class="locked-overlay">
                                     <i class="lock-icon">🔒</i>
-                                    <p>Este formulário será liberado em 25/05/2025</p>
+                                    <p>Este formulário será liberado às 09:00</p>
                                 </div>
                                 <!-- Form será mostrado quando desbloqueado -->
                             </div>
@@ -99,14 +99,14 @@
                         <div class="phase-header" data-phase="fase2">
                             <h4>Fase 2</h4>
                             <span class="status-badge locked">Bloqueado</span>
-                            <span class="release-date">Liberação: 01/06/2025</span>
+                            <span class="release-date">Liberação: 12:00</span>
                             <span class="toggle-icon">▼</span>
                         </div>
                         <div class="phase-content" id="fase2-content">
                             <div class="google-form-container">
                                 <div class="locked-overlay">
                                     <i class="lock-icon">🔒</i>
-                                    <p>Este formulário será liberado em 01/06/2025</p>
+                                    <p>Este formulário será liberado às 12:00</p>
                                 </div>
                             </div>
                         </div>
@@ -117,14 +117,14 @@
                         <div class="phase-header" data-phase="fase3">
                             <h4>Fase 3</h4>
                             <span class="status-badge locked">Bloqueado</span>
-                            <span class="release-date">Liberação: 08/06/2025</span>
+                            <span class="release-date">Liberação: 13:30</span>
                             <span class="toggle-icon">▼</span>
                         </div>
                         <div class="phase-content" id="fase3-content">
                             <div class="google-form-container">
                                 <div class="locked-overlay">
                                     <i class="lock-icon">🔒</i>
-                                    <p>Este formulário será liberado em 08/06/2025</p>
+                                    <p>Este formulário será liberado às 13:30</p>
                                 </div>
                             </div>
                         </div>
@@ -135,32 +135,31 @@
                         <div class="phase-header" data-phase="fase4">
                             <h4>Fase 4</h4>
                             <span class="status-badge locked">Bloqueado</span>
-                            <span class="release-date">Liberação: 15/06/2025</span>
+                            <span class="release-date">Liberação: 15:30</span>
                             <span class="toggle-icon">▼</span>
                         </div>
                         <div class="phase-content" id="fase4-content">
                             <div class="google-form-container">
                                 <div class="locked-overlay">
                                     <i class="lock-icon">🔒</i>
-                                    <p>Este formulário será liberado em 15/06/2025</p>
+                                    <p>Este formulário será liberado às 15:30</p>
                                 </div>
                             </div>
                         </div>
                     </div>
                     
-                    <!-- Fase 5 -->
-                    <div class="form-phase locked">
-                        <div class="phase-header" data-phase="fase5">
-                            <h4>Fase 5</h4>
-                            <span class="status-badge locked">Bloqueado</span>
-                            <span class="release-date">Liberação: 22/06/2025</span>
+                    <!-- Fase Extra (Fase 5) - Sempre aberta, dica exibida ao clicar -->
+                    <div class="form-phase active">
+                        <div class="phase-header" data-phase="fase-extra" style="cursor:pointer;">
+                            <h4>Fase Extra</h4>
+                            <span class="status-badge available">Dica</span>
                             <span class="toggle-icon">▼</span>
                         </div>
-                        <div class="phase-content" id="fase5-content">
+                        <div class="phase-content" id="fase-extra-content" style="display: none;">
                             <div class="google-form-container">
-                                <div class="locked-overlay">
-                                    <i class="lock-icon">🔒</i>
-                                    <p>Este formulário será liberado em 22/06/2025</p>
+                                <div class="info-overlay">
+                                    <i class="info-icon">💡</i>
+                                    <p><strong>Dica:</strong> Existe uma <span style='color:#1976d2;'>fase secreta</span> escondida neste evento! Se você encontrá-la, poderá ganhar pontos extras.<br>Fique atento aos detalhes, explore o site e boa sorte na caçada! 🕵️‍♂️✨</p>
                                 </div>
                             </div>
                         </div>

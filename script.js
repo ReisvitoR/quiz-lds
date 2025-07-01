@@ -3,11 +3,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Helper function to create Date objects for 01/07/2025 with specific times
     function createDateForToday(timeString) { // e.g., "07:00:00"
-        // Correção: Usar 'T' para evitar problemas de fuso horário (timezone)
-        const testDate = new Date('2025-07-01T00:00:00');
+        // Corrige para usar a data de hoje, não data fixa!
+        const today = new Date();
         const [hours, minutes, seconds] = timeString.split(':').map(Number);
-        testDate.setHours(hours, minutes, seconds, 0);
-        return testDate;
+        today.setHours(hours, minutes, seconds || 0, 0);
+        return today;
     }
 
     // --- Particle Class Definition (used by manageParticleCanvas) ---
@@ -446,156 +446,137 @@ document.addEventListener('DOMContentLoaded', () => {
         const testDate = new Date('2025-07-01T' + new Date().toTimeString().split(' ')[0]);
         return testDate;
         
-        // Descomente uma linha abaixo para testar diferentes horários específicos
-        // return new Date('2025-07-01T08:30:00'); // Simula 8:30 (Credenciamento ativo)
-        // return new Date('2025-07-01T10:30:00'); // Simula 10:30 (Fase 3 ou 4 ativa)
-        // return new Date('2025-07-01T12:30:00'); // Simula 12:30 (Fase 5 ativa)
-        // return new Date('2025-07-01T18:30:00'); // Simula 18:30 (Todas fases encerradas)
-        // return new Date(); // Usar data/hora real
     }
 
     // Função para inicializar o sistema de fases
+    var faseExtraHeader = null;
+    var faseExtraContent = null;
+
     function initPhaseSystem() {
         const phaseHeaders = document.querySelectorAll('.phase-header');
-        
-        function reorganizeHeadersForMobile() {
-            phaseHeaders.forEach(header => {
-                if (header.querySelector('.phase-header-info')) return;
-                
-                const statusBadge = header.querySelector('.status-badge');
-                const releaseDate = header.querySelector('.release-date');
-                const toggleIcon = header.querySelector('.toggle-icon');
-                
-                const infoContainer = document.createElement('div');
-                infoContainer.className = 'phase-header-info';
-                
-                if (statusBadge) infoContainer.appendChild(statusBadge);
-                if (releaseDate) infoContainer.appendChild(releaseDate);
-                if (toggleIcon) infoContainer.appendChild(toggleIcon);
-                
-                header.appendChild(infoContainer);
-            });
-        }
-        
-        reorganizeHeadersForMobile();
-        
+
+        // Adiciona o evento de clique para expandir/colapsar em todas as fases, exceto a extra
         phaseHeaders.forEach(header => {
-            const phaseContent = header.nextElementSibling;
-            if (phaseContent) {
-                phaseContent.style.display = 'none';
-                header.classList.add('collapsed');
-            }
-        });
-        
-        phaseHeaders.forEach(header => {
+            const phaseId = header.dataset.phase;
+            if (phaseId === 'fase-extra') return; // Pula a fase extra
+
             header.addEventListener('click', function() {
-                const phase = this.parentElement;
-                const phaseContent = this.nextElementSibling;
-                
-                if (phase.classList.contains('locked') || phase.classList.contains('unavailable')) {
-                    showLockedNotification(this.dataset.phase);
+                // Só permite expandir se não estiver bloqueada
+                if (this.parentElement.classList.contains('locked') || this.parentElement.classList.contains('unavailable')) {
                     return;
                 }
-                
-                if (phase.classList.contains('active')) {
-                    const toggleIcon = this.querySelector('.toggle-icon');
-                    if (phaseContent.style.display === 'block') {
-                        phaseContent.style.display = 'none';
-                        this.classList.add('collapsed');
-                        if (toggleIcon) toggleIcon.textContent = '▼';
-                    } else {
+
+                const phaseContent = document.getElementById(`${phaseId}-content`);
+                const toggleIcon = this.querySelector('.toggle-icon');
+
+                if (phaseContent) {
+                    // Carrega o formulário no primeiro clique
+                    const formReady = phaseContent.querySelector('.form-ready');
+                    if (formReady) {
+                        const formUrl = formReady.dataset.formUrl;
+                        phaseContent.innerHTML = `
+                            <div class="google-form-container form-loaded">
+                                <iframe
+                                    class="google-form-iframe"
+                                    src="${formUrl}"
+                                    width="100%"
+                                    frameborder="0"
+                                    marginheight="0"
+                                    marginwidth="0"
+                                    allowfullscreen="true"
+                                    loading="lazy">
+                                    Carregando…
+                                </iframe>
+                            </div>
+                        `;
+                    }
+
+                    const isCollapsed = this.classList.contains('collapsed');
+                    if (isCollapsed) {
                         phaseContent.style.display = 'block';
                         this.classList.remove('collapsed');
                         if (toggleIcon) toggleIcon.textContent = '▲';
-                        
-                        const formContainer = phaseContent.querySelector('.form-ready');
-                        if (formContainer && !phaseContent.querySelector('.form-loaded')) {
-                            const formUrl = formContainer.dataset.formUrl;
-                            
-                            // Carrega o iframe
-                            formContainer.innerHTML = `
-                                <div class="google-form-container form-loaded">
-                                    <iframe src="${formUrl}" class="google-form-iframe" frameborder="0" marginheight="0" marginwidth="0">Carregando…</iframe>
-                                </div>
-                            `;
-                            formContainer.classList.remove('form-ready');
-                        }
+                    } else {
+                        phaseContent.style.display = 'none';
+                        this.classList.add('collapsed');
+                        if (toggleIcon) toggleIcon.textContent = '▼';
                     }
                 }
             });
         });
-        
-        checkPhaseReleases();
-        setInterval(checkPhaseReleases, 60000);
-    }
 
-    function showLockedNotification(phaseId) {
-        const schedule = {
-            "inscricao": { start: createDateForToday("07:00:00"), end: createDateForToday("09:00:00") },
-            "fase1": { start: createDateForToday("09:00:00"), end: createDateForToday("20:00:00") },
-            "fase2": { start: createDateForToday("12:00:00"), end: createDateForToday("20:00:00") },
-            "fase3": { start: createDateForToday("13:30:00"), end: createDateForToday("20:00:00") },
-            "fase4": { start: createDateForToday("15:30:00"), end: createDateForToday("20:00:00") },
-            "fase-secreta": { start: createDateForToday("15:30:00"), end: createDateForToday("20:00:00") }
-        };
-        const phaseSchedule = schedule[phaseId];
-        if (!phaseSchedule) {
-            alert("Informações sobre esta fase não estão disponíveis.");
-            return;
+        // Lógica específica para a Fase Extra (dica)
+        const faseExtraHeader = document.querySelector('.phase-header[data-phase="fase-extra"]');
+        const faseExtraContent = document.getElementById('fase-extra-content');
+        if (faseExtraHeader && faseExtraContent) {
+            faseExtraHeader.classList.add('collapsed');
+            faseExtraContent.style.display = 'none'; // Começa fechada
+            faseExtraHeader.addEventListener('click', function() {
+                const isCollapsed = this.classList.contains('collapsed');
+                if (isCollapsed) {
+                    faseExtraContent.style.display = 'block';
+                    this.classList.remove('collapsed');
+                    this.querySelector('.toggle-icon').textContent = '▲';
+                } else {
+                    faseExtraContent.style.display = 'none';
+                    this.classList.add('collapsed');
+                    this.querySelector('.toggle-icon').textContent = '▼';
+                }
+            });
         }
-        const formatTime = (date) => date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-        const formatDate = (date) => date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
-        const phaseElement = document.querySelector(`.form-phase .phase-header[data-phase="${phaseId}"]`).parentElement;
-        if (phaseElement.classList.contains('locked')) {
-            alert(`Esta fase estará disponível a partir das ${formatTime(phaseSchedule.start)} de ${formatDate(phaseSchedule.start)}.`);
-        } else if (phaseElement.classList.contains('unavailable')) {
-            alert(`Esta fase foi encerrada às ${formatTime(phaseSchedule.end)} de ${formatDate(phaseSchedule.end)}.`);
-        }
+
+        checkPhaseReleases();
+        setInterval(checkPhaseReleases, 30000); // Verifica a cada 30 segundos
     }
 
     function checkPhaseReleases() {
         const schedule = {
-            "inscricao": { start: createDateForToday("07:00:00"), end: createDateForToday("09:00:00") },
+            "inscricao": { start: createDateForToday("07:00:00"), end: createDateForToday("23:59:59") },
             "fase1": { start: createDateForToday("09:00:00"), end: createDateForToday("20:00:00") },
             "fase2": { start: createDateForToday("12:00:00"), end: createDateForToday("20:00:00") },
             "fase3": { start: createDateForToday("13:30:00"), end: createDateForToday("20:00:00") },
             "fase4": { start: createDateForToday("15:30:00"), end: createDateForToday("20:00:00") },
             "fase-secreta": { start: createDateForToday("15:30:00"), end: createDateForToday("20:00:00") }
         };
-        const allPhases = ["inscricao", "fase1", "fase2", "fase3", "fase4", "fase-secreta"];
-        const currentDate = getSimulatedDate();
+
+        const allPhases = ["fase1", "fase2", "fase3", "fase4", "fase-secreta"];
+        const currentDate = new Date();
+
         allPhases.forEach(phaseId => {
-            const phaseHeaderElement = document.querySelector(`.form-phase .phase-header[data-phase="${phaseId}"]`);
-            if (!phaseHeaderElement) return;
-            const phase = phaseHeaderElement.parentElement;
-            const statusBadge = phaseHeaderElement.querySelector('.status-badge');
-            const releaseInfo = phaseHeaderElement.querySelector('.release-date');
+            const phaseHeader = document.querySelector(`.phase-header[data-phase="${phaseId}"]`);
+            if (!phaseHeader) return;
+
+            const phaseElement = phaseHeader.parentElement;
+            const statusBadge = phaseHeader.querySelector('.status-badge');
+            const releaseInfo = phaseHeader.querySelector('.release-date');
             const phaseContent = document.getElementById(`${phaseId}-content`);
-            const formatTime = (date) => date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
             const timeWindow = schedule[phaseId];
+            const formatTime = (date) => date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+
             if (currentDate >= timeWindow.start && currentDate < timeWindow.end) {
-                phase.classList.remove('locked', 'unavailable');
-                phase.classList.add('active');
-                if (statusBadge) { statusBadge.textContent = "Disponível"; statusBadge.className = "status-badge available"; }
-                if (releaseInfo) { releaseInfo.textContent = `Disponível até: ${formatTime(timeWindow.end)}`; releaseInfo.className = "release-date available-time"; }
-                unlockPhase(phaseId);
-            } else if (currentDate < timeWindow.start) {
-                phase.classList.remove('active', 'unavailable');
-                phase.classList.add('locked');
-                if (statusBadge) { statusBadge.textContent = "Bloqueado"; statusBadge.className = "status-badge locked"; }
-                if (releaseInfo) { releaseInfo.textContent = `Liberação: ${formatTime(timeWindow.start)}`; }
-                if (phaseContent) {
-                    phaseContent.style.display = 'none';
-                    phaseHeaderElement.classList.add('collapsed');
+                // Desbloqueia a fase
+                if (phaseElement.classList.contains('locked')) {
+                    unlockPhase(phaseId);
+                    statusBadge.textContent = 'Disponível';
+                    statusBadge.className = 'status-badge available';
+                    releaseInfo.textContent = `Disponível até ${formatTime(timeWindow.end)}`;
+                    phaseHeader.style.cursor = 'pointer';
+                    phaseElement.classList.remove('locked');
+                    phaseElement.classList.add('active');
                 }
             } else {
-                phase.classList.remove('active', 'locked');
-                phase.classList.add('unavailable');
-                if (statusBadge) { statusBadge.textContent = "Encerrado"; statusBadge.className = "status-badge unavailable"; }
-                if (releaseInfo) { releaseInfo.textContent = `Encerrado às ${formatTime(timeWindow.end)}`; releaseInfo.className = "release-date unavailable-time"; }
-                if (phaseContent) {
-                    phaseContent.style.display = 'none';
-                    phaseHeaderElement.classList.add('collapsed');
+                // Mantém ou define como bloqueada
+                if (!phaseElement.classList.contains('locked')) {
+                    phaseElement.classList.add('locked');
+                    phaseElement.classList.remove('active');
+                    statusBadge.textContent = 'Bloqueado';
+                    statusBadge.className = 'status-badge locked';
+                    phaseHeader.style.cursor = 'not-allowed';
+                    releaseInfo.textContent = `Liberação: ${formatTime(timeWindow.start)}`;
+                    if (phaseContent && !phaseContent.querySelector('.locked-overlay')) {
+                        phaseContent.innerHTML = `<div class="locked-overlay"><i class="lock-icon">🔒</i><p>Este formulário será liberado às ${formatTime(timeWindow.start)}</p></div>`;
+                    }
+                    phaseContent.style.display = 'block'; // Mostra o overlay de bloqueio
                 }
             }
         });
@@ -607,18 +588,24 @@ document.addEventListener('DOMContentLoaded', () => {
         const phaseElement = phaseHeader.parentElement;
         const phaseContent = document.getElementById(`${phaseId}-content`);
         if (!phaseContent) return;
+
         phaseElement.classList.remove('locked', 'unavailable');
         phaseElement.classList.add('active');
+
         const formURLs = {
-            "inscricao": "https://forms.gle/credID", // Atualize para o link correto de inscrição
             "fase1": "https://docs.google.com/forms/d/e/1FAIpQLSdFVowu6LE4EypsOQ5QlcwgKacCWKXYI8N30C7L3aRWegZY4g/viewform?embedded=true",
-            "fase2": "https://docs.google.com/forms/d/e/1FAIpQLSdFVowu6LE4EypsOQ5QlcwgKacCWKXYI8N30C7L3aRWegZY4g/viewform?embedded=true",
-            "fase3": "https://docs.google.com/forms/d/e/1FAIpQLSdFVowu6LE4EypsOQ5QlcwgKacCWKXYI8N30C7L3aRWegZY4g/viewform?embedded=true",
-            "fase4": "https://docs.google.com/forms/d/e/1FAIpQLSdFVowu6LE4EypsOQ5QlcwgKacCWKXYI8N30C7L3aRWegZY4g/viewform?embedded=true",
-            "fase-secreta": "https://docs.google.com/forms/d/e/1FAIpQLSdFVowu6LE4EypsOQ5QlcwgKacCWKXYI8N30C7L3aRWegZY4g/viewform?embedded=true"
+            "fase2": "https://docs.google.com/forms/d/e/1FAIpQLScTBHQA2Qq7TQ2VnfAcRtgusPefEInCDc6bNcs_Nz0LK_QOUw/viewform?embedded=true",
+            "fase3": "https://docs.google.com/forms/d/e/1FAIpQLSeDByPCt1tJoRcYB7M2pTKYSeXk0IfYBiBAug1EhhHNL2F3Vg/viewform?embedded=true",
+            "fase4": "https://docs.google.com/forms/d/e/1FAIpQLSfwxyaJmYKfG-61o_AM_aIKAjcgxba8hEBCqdaW5GcxYiP4Wg/viewform?embedded=true"
         };
-        const lockedOverlay = phaseContent.querySelector('.locked-overlay, .unavailable-overlay');
-        if (lockedOverlay) lockedOverlay.remove();
+
+        // Remove o overlay de bloqueio
+        const lockedOverlay = phaseContent.querySelector('.locked-overlay');
+        if (lockedOverlay) {
+            lockedOverlay.parentElement.remove();
+        }
+
+        // Prepara o conteúdo para carregar o form no clique, se ainda não foi feito
         if (!phaseContent.querySelector('.form-loaded') && !phaseContent.querySelector('.form-ready')) {
             phaseContent.innerHTML = `
                 <div class="form-ready" data-form-url="${formURLs[phaseId]}">
@@ -628,8 +615,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             `;
         }
+
+        // Garante que o conteúdo da fase fique oculto inicialmente
         phaseContent.style.display = 'none';
         phaseHeader.classList.add('collapsed');
+        const toggleIcon = phaseHeader.querySelector('.toggle-icon');
+        if (toggleIcon) toggleIcon.textContent = '▼';
     }
 
     initPhaseSystem();
@@ -659,9 +650,8 @@ document.addEventListener('DOMContentLoaded', () => {
         .form-phase.active .phase-header { color: #4CAF50; cursor: pointer; }
         .form-phase.active .phase-header:hover { background-color: #f5f5f5; }
         .form-phase.unavailable { border-left-color: #f44336 !important; opacity: 0.8; }
-        .form-phase.unavailable .phase-header { color: #f44336; cursor: not-allowed; }
         .phase-header { display: flex; align-items: center; justify-content: space-between; padding: 15px 20px; background-color: #fafafa; border-bottom: 1px solid #e0e0e0; transition: background-color 0.2s ease; flex-wrap: wrap; gap: 10px; }
-        .phase-header h4 { margin: 0; flex-grow: 1, min-width: 0; }
+        .phase-header h4 { margin: 0; flex-grow: 1, min-width: 0; color: inherit; }
         .phase-header-info { display: flex; align-items: center; flex-wrap: wrap; gap: 5px; }
         .phase-header .toggle-icon { color: #666; font-size: 16px; margin-left: 10px; transition: transform 0.2s ease; flex-shrink: 0; }
         .phase-header.collapsed .toggle-icon { transform: rotate(0deg); }
@@ -673,6 +663,112 @@ document.addEventListener('DOMContentLoaded', () => {
         .unavailable-icon { font-size: 40px; margin-bottom: 15px; }
         .google-form-container { padding: 10px; background: #fff; }
         .google-form-iframe { width: 100%; height: 80vh; border: none; }
+
+        /* Corrige fundo e texto do data-fields e outras seções no darkmode */
+        body.darkmode, body.darkmode * {
+            color: #fff !important;
+            border-color: #333 !important;
+        }
+        body.darkmode {
+            background-color: #121212 !important;
+        }
+        body.darkmode .status-badge.locked {
+            background-color: #666 !important;
+        }
+        body.darkmode .status-badge.available {
+            background-color: #66bb6a !important;
+        }
+        body.darkmode .status-badge.unavailable {
+            background-color: #ef5350 !important;
+        }
+        body.darkmode .form-phase {
+            background-color: #1e1e1e !important;
+            border-left-color: #666 !important;
+        }
+        body.darkmode .phase-header {
+            background-color: #1c1c1c !important;
+            color: #fff !important;
+        }
+        body.darkmode .phase-header h4 {
+            color: #fff !important;
+        }
+        body.darkmode .release-date {
+            color: #b0b0b0 !important;
+        }
+        body.darkmode .google-form-container {
+            background-color: #2c2c2c !important;
+        }
+        body.darkmode .google-form-iframe {
+            background-color: #2c2c2c !important;
+        }
+        body.darkmode .loading-message, body.darkmode .unavailable-overlay {
+            background: rgba(30,30,30,0.9) !important;
+            color: #fff !important;
+        }
+        body.darkmode .icon-sun {
+            display: none !important;
+        }
+        body.darkmode .icon-moon {
+            display: inline !important;
+        }
+        /* Corrige fundo e texto do #data-fields */
+        body.darkmode #data-fields {
+            background: #181818 !important;
+            color: #fff !important;
+        }
+        body.darkmode #data-fields * {
+            color: #fff !important;
+        }
+        /* Corrige fundo e texto do #data-visualization */
+        body.darkmode #data-visualization {
+            background: #181818 !important;
+            color: #fff !important;
+        }
+        body.darkmode #data-visualization * {
+            color: #fff !important;
+        }
+        /* Corrige inputs, botões e campos de formulário */
+        body.darkmode input, body.darkmode textarea, body.darkmode select {
+            background: #232323 !important;
+            color: #fff !important;
+            border-color: #444 !important;
+        }
+        body.darkmode button, body.darkmode .btn, body.darkmode .button {
+            background: #333 !important;
+            color: #fff !important;
+            border-color: #666 !important;
+        }
+        /* Corrige cards e campos de dados */
+        body.darkmode .field-card, body.darkmode .data-card, body.darkmode .card {
+            background: #232323 !important;
+            color: #fff !important;
+            border-color: #444 !important;
+        }
+        /* Corrige links */
+        body.darkmode a, body.darkmode a:visited {
+            color: #90caf9 !important;
+        }
+        /* Corrige títulos */
+        body.darkmode h1, body.darkmode h2, body.darkmode h3, body.darkmode h4, body.darkmode h5, body.darkmode h6 {
+            color: #fff !important;
+        }
+        /* Corrige fundo do dashboard Looker Studio */
+        body.darkmode .dashboard-container {
+            background: #181818 !important;
+        }
+        /* Corrige fundo do game e áreas do jogo */
+        body.darkmode #navbarGame, body.darkmode #gameArea, body.darkmode .game-call-to-action {
+            background: #181818 !important;
+            color: #fff !important;
+        }
+        /* Corrige fundo do body para evitar flashes */
+        html, body {
+            background-color: #fff;
+        }
+        body.darkmode html, body.darkmode {
+            background-color: #121212 !important;
+        }
+        /* Fim das correções darkmode */
 
         @media (max-width: 768px) {
             .phase-header { padding: 12px 15px; flex-direction: column; align-items: flex-start; gap: 8px; }
@@ -695,6 +791,79 @@ document.addEventListener('DOMContentLoaded', () => {
             .phase-header { min-height: 44px; -webkit-tap-highlight-color: rgba(0,0,0,0.1); }
             .form-phase.active .phase-header:active { background-color: #e8e8e8; }
         }
+
+        /* Estilos para darkmode */
+        body.darkmode {
+            background-color: #121212;
+            color: #e0e0e0;
+        }
+        body.darkmode .status-badge.locked {
+            background-color: #666;
+        }
+        body.darkmode .status-badge.available {
+            background-color: #66bb6a;
+        }
+        body.darkmode .status-badge.unavailable {
+            background-color: #ef5350;
+        }
+        body.darkmode .form-phase {
+            background-color: #1e1e1e;
+            border-left-color: #666;
+        }
+        body.darkmode .phase-header {
+            background-color: #1c1c1c;
+            color: #e0e0e0;
+        }
+        body.darkmode .phase-header h4 {
+            color: #e0e0e0;
+        }
+        body.darkmode .release-date {
+            color: #b0b0b0;
+        }
+        body.darkmode .google-form-container {
+            background-color: #2c2c2c;
+        }
+        body.darkmode .google-form-iframe {
+            background-color: #2c2c2c;
+        }
+        body.darkmode .loading-message, body.darkmode .unavailable-overlay {
+            background: rgba(30,30,30,0.9);
+        }
+        body.darkmode .icon-sun {
+            display: none;
+        }
+        body.darkmode .icon-moon {
+            display: inline;
+        }
     `;
     document.head.appendChild(styleSheet);
+
+    // Alternância de tema (darkmode/claromode)
+    const themeToggle = document.getElementById('themeToggle');
+    if (themeToggle) {
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('darkmode');
+            const isDark = document.body.classList.contains('darkmode');
+            themeToggle.querySelector('.icon-sun').style.display = isDark ? '' : 'none';
+            themeToggle.querySelector('.icon-moon').style.display = isDark ? 'none' : '';
+        });
+    }
+
+    // Lógica de exibir/ocultar dica da fase extra (apenas uma vez no final do DOMContentLoaded)
+    if (faseExtraHeader && faseExtraContent) {
+        faseExtraHeader.classList.add('collapsed');
+        faseExtraContent.style.display = 'none';
+        faseExtraHeader.addEventListener('click', function() {
+            var toggleIcon = faseExtraHeader.querySelector('.toggle-icon');
+            if (faseExtraContent.style.display === 'block') {
+                faseExtraContent.style.display = 'none';
+                faseExtraHeader.classList.add('collapsed');
+                if (toggleIcon) toggleIcon.textContent = '▼';
+            } else {
+                faseExtraContent.style.display = 'block';
+                faseExtraHeader.classList.remove('collapsed');
+                if (toggleIcon) toggleIcon.textContent = '▲';
+            }
+        });
+    }
 });
